@@ -41,3 +41,12 @@ jobs:
       run: pip install nose
     - name: Run tests
       run: nosetests
+    - name: Confirm command-line interface runs help menus
+      run: |
+        ontospy --help
+        ontospy gendocs --help
+        ontospy lib --help
+        ontospy scan --help
+        ontospy ser --help
+        ontospy shell --help
+        ontospy utils --help
