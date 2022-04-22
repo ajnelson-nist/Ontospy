@@ -12,11 +12,11 @@ In this file,
     OntoClass is the ontospy class ontospy.core.entities.OntoClass
 '''
 
-import typing
+from typing import Any, List, Set
 
 from collections import defaultdict
 import rdflib
-from rdflib import SH, RDFS
+from rdflib import SH, RDFS, URIRef
     # SH   = http://www.w3.org/ns/shacl#
     # OWL  = http://www.w3.org/2002/07/owl#
     # RDF  = http://www.w3.org/1999/02/22-rdf-syntax-ns#
@@ -24,6 +24,12 @@ from rdflib import SH, RDFS
 
 import ontospy
 
+
+# all_classes is a module-level tracking of all of the SHACL classes known to the caller of build_shacl_constraints.
+# As a reminder, SHACL classes are explicitly noted as classes (e.g. RDF or OWL Class instances), or are inferred to be classes by appearing as a rdf:type Object.
+# https://www.w3.org/TR/shacl/#dfn-shacl-class
+# all_classes is indexed by the IRI of the class.  Note that this constrains OntoSpy to only representing classes that are not BNodes, which might or might not be an issue with anonymous classes defined as part of OWL Restrictions.
+all_classes: Dict[URIRef, OntoClass] = dict()
 
 class NodeShape:
     '''
@@ -38,17 +44,12 @@ class NodeShape:
         self.qname           The qname (onto_class.qname if onto_class is not None)
     '''
     # Class constant
-    all_classes = {}
     namespace_manager = None
 
     def __init__(self, class_uri):
         self.class_uri = class_uri
         self.onto_class = self.all_classes.get(class_uri)  # May be None
         self.qname = self.namespace_manager.qname(class_uri)
-
-    @classmethod
-    def set_all_classes(cls, all_classes):
-        cls.all_classes = all_classes
 
     @classmethod
     def set_namespace_manager(cls, namespaces):
@@ -229,19 +230,21 @@ def build_shacl_constraints(ontology_object: ontospy.core.entities.Ontology) -> 
     Property.set_all_properties(all_properties)
     Property.set_namespace_manager(ontology_object.namespaces)
 
-    # Compute {class_uri:OntoClass}
-    all_classes = {onto_class.uri:onto_class for onto_class in ontology_object.all_classes}      # {class_uri:OntoClass}
-    NodeShape.set_all_classes(all_classes)
+    # Populate the dictionary mapping class IRIs to OntoClass objects.
+    for onto_class in ontology_object.all_classes:
+        all_classes[onto_class.uri] = onto_class
     NodeShape.set_namespace_manager(ontology_object.namespaces)
 
     # Do for each class in the ontology
+    onto_class: URIRef
     for onto_class in ontology_object.all_classes:
 
         # Start with an empty LIST of ordered Constraint objects for this onto_class
         constraints = []   # [Constraint]
 
         # Do for each class in the lineage (self, parents, grandparents, etc)
-        lineage_classes = get_lineage(onto_class)
+        lineage_classes: List[URIRef] = get_lineage(onto_class)
+        lineage_class: URIRef
         for lineage_class in lineage_classes:
 
             # If class has no shapes, skip
@@ -392,7 +395,7 @@ def add_owl_property_constraints(property_constraints):
 
 
 
-def get_lineage(onto_class):
+def get_lineage(onto_class: URIRef) -> List[URIRef]:
     '''
     Arguments:
         onto_class    An ontoClass object
@@ -403,7 +406,8 @@ def get_lineage(onto_class):
         Remaining items are ancestor classes in breadth-first search order
     '''
     # Inner class -- recursively add ancestors, one generation at a time (breadth-first)
-    def _add_ancestors(sibling_classes):
+    def _add_ancestors(sibling_classes: List[URIRef]) -> None:
+        #TODO - Reconcile what the type system has been suggesting would be passed, versus the documentation expecting OntoClass objects.
         '''
         Arguments:
             sibling_classes  LIST of ontoClass objects whose parents to add
@@ -429,13 +433,13 @@ def get_lineage(onto_class):
 
 
     # Start with self
-    onto_classes = [onto_class]
+    onto_classes: List[URIRef] = [onto_class]
 
     # Add ancestors
-    _add_ancestors([onto_class])
+    _add_ancestors(onto_classes)
 
     # Remove duplicates while maintaining order
-    unique_onto_classes = []
+    unique_onto_classes: List[] = []  #TODO - What is the type of unique_onto_classes, List[OntoClass] or List[URIRef]?
     for onto_class in onto_classes:
         if onto_class not in unique_onto_classes:
             unique_onto_classes.append(onto_class)

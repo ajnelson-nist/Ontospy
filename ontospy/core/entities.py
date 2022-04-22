@@ -33,7 +33,7 @@ class RdfEntity(object):
         return "<Ontospy: RdfEntity object for uri *%s*>" % (self.uri)
 
     def __init__(self,
-                 uri,
+                 uri: rdflib.URIRef,
                  rdftype=None,
                  namespaces=None,
                  ext_model=False,
@@ -51,7 +51,7 @@ class RdfEntity(object):
         """
         self.id = next(self._ids)
 
-        self.uri = uri  # rdflib.Uriref
+        self.uri: rdflib.URIRef = uri
 
         self.locale = inferURILocalSymbol(self.uri)[0]
         self.ext_model = ext_model
@@ -321,7 +321,7 @@ class OntoClass(RdfEntity):
             ]
     """
 
-    def __init__(self, uri, rdftype=None, namespaces=None, 
+    def __init__(self, uri: rdflib.URIRef, rdftype=None, namespaces=None, 
                 ext_model=False, pref_title="qname", pref_lang="en"):
         """
         ...
