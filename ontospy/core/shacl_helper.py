@@ -232,8 +232,9 @@ def build_shacl_constraints(ontology_object: Ontology) -> Dict[OntoClass, Constr
     Property.set_namespace_manager(ontology_object.namespaces)
 
     # Populate the dictionary mapping class IRIs to OntoClass objects.
-    for onto_class in ontology_object.all_classes:
-        all_classes[onto_class.uri] = onto_class
+    ontology_class: OntoClass
+    for ontology_class in ontology_object.all_classes:
+        all_classes[ontology_class.uri] = ontology_class
     NodeShape.set_namespace_manager(ontology_object.namespaces)
 
     # Do for each class in the ontology

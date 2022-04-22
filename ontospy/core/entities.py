@@ -3,6 +3,8 @@
 
 from __future__ import print_function
 
+from typing import List
+
 from colorama import Fore, Style
 
 import rdflib
@@ -277,7 +279,7 @@ class Ontology(RdfEntity):
         # self.uri = uri # rdflib.Uriref
         self.prefix = pref_prefix
         self.slug = "ontology-" + slugify(self.qname)
-        self.all_classes = []
+        self.all_classes: List[OntoClass] = []
         self.all_properties = []
         self.all_skos_concepts = []
 
