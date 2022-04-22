@@ -12,17 +12,18 @@ In this file,
     OntoClass is the ontospy class ontospy.core.entities.OntoClass
 '''
 
-from typing import Any, List, Set
+from typing import Any, Dict, List, Set, Union
 
 from collections import defaultdict
 import rdflib
-from rdflib import SH, RDFS, URIRef
+from rdflib import BNode, RDFS, SH, URIRef
     # SH   = http://www.w3.org/ns/shacl#
     # OWL  = http://www.w3.org/2002/07/owl#
     # RDF  = http://www.w3.org/1999/02/22-rdf-syntax-ns#
     # RDFS = http://www.w3.org/2000/01/rdf-schema#
 
 import ontospy
+from ontospy.core.entities import OntoClass, Ontology
 
 
 # all_classes is a module-level tracking of all of the SHACL classes known to the caller of build_shacl_constraints.
@@ -187,7 +188,7 @@ class Constraint:
 
 
 
-def build_shacl_constraints(ontology_object: ontospy.core.entities.Ontology) -> typing.Dict[ontospy.core.entities.OntoClass, Constraint]:
+def build_shacl_constraints(ontology_object: Ontology) -> Dict[OntoClass, Constraint]:
     '''
     Arguments:
         ontology_object   An Ontospy Ontology object
@@ -305,7 +306,7 @@ def add_property_constraints_from_shape_triples(class_uri, property_constraints,
 
     # Get property bnodes
     # FIXME: The 'bnodes' variable makes an incorrect assumption on the graph node in the object position of 'sh:property'.  A SHACL PropertyShape can be identified as a blank node or an IRI.  This class is being incorrectly filtered to only BNodes.
-    bnodes: typing.List[typing.Union[rdflib.URIRef, rdflib.BNode]] = spo_dict[class_uri].get(SH['property'], [])
+    bnodes: List[Union[URIRef, BNode]] = spo_dict[class_uri].get(SH['property'], [])
     if not bnodes:
         return
 
@@ -439,7 +440,7 @@ def get_lineage(onto_class: URIRef) -> List[URIRef]:
     _add_ancestors(onto_classes)
 
     # Remove duplicates while maintaining order
-    unique_onto_classes: List[] = []  #TODO - What is the type of unique_onto_classes, List[OntoClass] or List[URIRef]?
+    unique_onto_classes: List[URIRef] = []  #TODO - What is the type of unique_onto_classes, List[OntoClass] or List[URIRef]?
     for onto_class in onto_classes:
         if onto_class not in unique_onto_classes:
             unique_onto_classes.append(onto_class)
