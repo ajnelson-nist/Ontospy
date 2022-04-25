@@ -5,7 +5,7 @@ from __future__ import print_function
 
 from typing import List
 
-from colorama import Fore, Style
+from colorama import Fore, Style  # type: ignore
 
 import rdflib
 from itertools import count

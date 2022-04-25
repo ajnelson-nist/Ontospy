@@ -9,7 +9,7 @@ Copyright (c) 2010-2015 __Michele Pasin__ <http://www.michelepasin.org>. All rig
 
 from __future__ import print_function
 
-from colorama import Fore, Style
+from colorama import Fore, Style  # type: ignore
 
 import rdflib
 from rdflib import RDFS, RDF, BNode
